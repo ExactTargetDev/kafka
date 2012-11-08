@@ -66,6 +66,7 @@ namespace Kafka.Client
             }
             catch (Exception e)
             {
+                Dispose();
                 throw new KafkaConnectionException(e);
             }
         }
@@ -76,7 +77,7 @@ namespace Kafka.Client
         /// Writes a producer request to the server asynchronously.
         /// </summary>
         /// <param name="request">The request to make.</param>
-        public void BeginWrite(ProducerRequest request)
+        public void BeginWrite(AbstractRequest request)
         {
             this.EnsuresNotDisposed();
             Guard.NotNull(request, "request");
@@ -151,21 +152,7 @@ namespace Kafka.Client
         /// Write timeout is defaulted to infitite.
         /// </remarks>
         /// <param name="request">The <see cref="ProducerRequest"/> to send to the server.</param>
-        public void Write(ProducerRequest request)
-        {
-            this.EnsuresNotDisposed();
-            Guard.NotNull(request, "request");
-            this.Write(request.RequestBuffer.GetBuffer());
-        }
-
-        /// <summary>
-        /// Writes a multi-producer request to the server.
-        /// </summary>
-        /// <remarks>
-        /// Write timeout is defaulted to infitite.
-        /// </remarks>
-        /// <param name="request">The <see cref="MultiProducerRequest"/> to send to the server.</param>
-        public void Write(MultiProducerRequest request)
+        public void Write(AbstractRequest request)
         {
             this.EnsuresNotDisposed();
             Guard.NotNull(request, "request");
@@ -192,48 +179,6 @@ namespace Kafka.Client
             {
                 throw new KafkaConnectionException(e);
             }
-        }
-
-        /// <summary>
-        /// Writes a fetch request to the server.
-        /// </summary>
-        /// <remarks>
-        /// Write timeout is defaulted to infitite.
-        /// </remarks>
-        /// <param name="request">The <see cref="FetchRequest"/> to send to the server.</param>
-        public void Write(FetchRequest request)
-        {
-            this.EnsuresNotDisposed();
-            Guard.NotNull(request, "request");
-            this.Write(request.RequestBuffer.GetBuffer());
-        }
-
-        /// <summary>
-        /// Writes a multifetch request to the server.
-        /// </summary>
-        /// <remarks>
-        /// Write timeout is defaulted to infitite.
-        /// </remarks>
-        /// <param name="request">The <see cref="MultiFetchRequest"/> to send to the server.</param>
-        public void Write(MultiFetchRequest request)
-        {
-            this.EnsuresNotDisposed();
-            Guard.NotNull(request, "request");
-            this.Write(request.RequestBuffer.GetBuffer());
-        }
-
-        /// <summary>
-        /// Writes a offset request to the server.
-        /// </summary>
-        /// <remarks>
-        /// Write timeout is defaulted to infitite.
-        /// </remarks>
-        /// <param name="request">The <see cref="OffsetRequest"/> to send to the server.</param>
-        public void Write(OffsetRequest request)
-        {
-            this.EnsuresNotDisposed();
-            Guard.NotNull(request, "request");
-            this.Write(request.RequestBuffer.GetBuffer());
         }
 
         /// <summary>

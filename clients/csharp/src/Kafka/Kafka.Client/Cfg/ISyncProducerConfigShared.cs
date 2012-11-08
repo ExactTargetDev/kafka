@@ -26,5 +26,12 @@ namespace Kafka.Client.Cfg
         int SocketTimeout { get; set; }
 
         int MaxMessageSize { get; set; }
+
+        int ReconnectInterval { get; set; }
+
+        /// <summary>
+        /// Negative reconnect time interval means disabling this time-based reconnect feature
+        /// </summary>
+        int ReconnectTimeInterval { get; set; }
     }
 }

@@ -101,7 +101,7 @@ namespace Kafka.Client.Producers
                 }
                 catch
                 {
-                    this.brokerPartitionInfo.Dispose();
+                    this.Dispose();
                     throw;
                 }
             }

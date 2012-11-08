@@ -130,6 +130,30 @@ namespace Kafka.Client.Cfg
             }
         }
 
+        [ConfigurationProperty(
+            "reconnectInterval",
+            DefaultValue = SyncProducerConfiguration.DefaultReconnectInterval,
+            IsRequired = false)]
+        public int ReconnectInterval
+        {
+            get
+            {
+                return (int)this["reconnectInterval"];
+            }
+        }
+
+        [ConfigurationProperty(
+            "reconnectTimeInterval",
+            DefaultValue = SyncProducerConfiguration.DefaultReconnectTimeInterval,
+            IsRequired = false)]
+        public int ReconnectTimeInterval
+        {
+            get
+            {
+                return (int)this["reconnectTimeInterval"];
+            }
+        }
+
         public static ProducerConfigurationSection FromXml(XElement xml)
         {
             var config = new ProducerConfigurationSection();

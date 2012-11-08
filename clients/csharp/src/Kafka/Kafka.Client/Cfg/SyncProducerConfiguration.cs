@@ -31,12 +31,16 @@ namespace Kafka.Client.Cfg
 
         public const int DefaultMaxMessageSize = 1000 * 1000;
 
+        public const int DefaultReconnectTimeInterval = 1000 * 1000 * 10;
+
         public SyncProducerConfiguration()
         {
             this.BufferSize = DefaultBufferSize;
             this.ConnectTimeout = DefaultConnectTimeout;
             this.SocketTimeout = DefaultSocketTimeout;
             this.MaxMessageSize = DefaultMaxMessageSize;
+            this.ReconnectInterval = DefaultReconnectInterval;
+            this.ReconnectTimeInterval = DefaultReconnectTimeInterval;
         }
 
         public SyncProducerConfiguration(ProducerConfiguration config, int id, string host, int port) 
@@ -50,6 +54,8 @@ namespace Kafka.Client.Cfg
             this.ConnectTimeout = config.ConnectTimeout;
             this.SocketTimeout = config.SocketTimeout;
             this.MaxMessageSize = config.MaxMessageSize;
+            this.ReconnectInterval = config.ReconnectInterval;
+            this.ReconnectTimeInterval = config.ReconnectTimeInterval;
         }
 
         public int BufferSize { get; set; }
@@ -65,5 +71,9 @@ namespace Kafka.Client.Cfg
         public int Port { get; set; }
 
         public int BrokerId { get; set; }
+
+        public int ReconnectInterval { get; set; }
+
+        public int ReconnectTimeInterval { get; set; }
     }
 }

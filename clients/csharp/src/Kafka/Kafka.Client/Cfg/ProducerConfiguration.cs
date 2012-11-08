@@ -50,6 +50,8 @@ namespace Kafka.Client.Cfg
             this.SocketTimeout = SyncProducerConfiguration.DefaultSocketTimeout;
             this.MaxMessageSize = SyncProducerConfiguration.DefaultMaxMessageSize;
             this.SerializerClass = AsyncProducerConfiguration.DefaultSerializerClass;
+            this.ReconnectInterval = SyncProducerConfiguration.DefaultReconnectInterval;
+            this.ReconnectTimeInterval = SyncProducerConfiguration.DefaultReconnectTimeInterval;
         }
 
         public ProducerConfiguration(XElement xml) : this(ProducerConfigurationSection.FromXml(xml))
@@ -78,6 +80,8 @@ namespace Kafka.Client.Cfg
             this.SocketTimeout = config.SocketTimeout;
             this.MaxMessageSize = config.MaxMessageSize;
             this.SerializerClass = config.Serializer;
+            this.ReconnectInterval = config.ReconnectInterval;
+            this.ReconnectTimeInterval = config.ReconnectTimeInterval;
             Validate(config);
             if (config.ZooKeeperServers.ElementInformation.IsPresent)
             {
@@ -181,6 +185,10 @@ namespace Kafka.Client.Cfg
         public string SerializerClass { get; set; }
 
         public string CallbackHandlerClass { get; set; }
+
+        public int ReconnectInterval { get; set; }
+
+        public int ReconnectTimeInterval { get; set; }
 
         private void SetZooKeeperServers(ZooKeeperConfigurationElement config)
         {
