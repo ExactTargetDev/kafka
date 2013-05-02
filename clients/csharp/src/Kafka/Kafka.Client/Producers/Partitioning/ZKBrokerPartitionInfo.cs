@@ -55,13 +55,14 @@ namespace Kafka.Client.Producers.Partitioning
         /// Initializes a new instance of the <see cref="ZKBrokerPartitionInfo"/> class.
         /// </summary>
         /// <param name="zkclient">The wrapper above ZooKeeper client.</param>
-        public ZKBrokerPartitionInfo(IZooKeeperClient zkclient)
+        /// <param name="callback">The callback invoked when new broker is added..</param>
+        public ZKBrokerPartitionInfo(IZooKeeperClient zkclient, Action<int, string, int> callback = null)
         {
             this.zkclient = zkclient;
             this.zkclient.Connect();
             this.InitializeBrokers();
             this.InitializeTopicBrokerPartitions();
-            this.brokerTopicsListener = new BrokerTopicsListener(this.zkclient, this.topicBrokerPartitions, this.brokers, this.callback);
+            this.brokerTopicsListener = new BrokerTopicsListener(this.zkclient, topicBrokerPartitions, brokers, callback);
             this.RegisterListeners();
         }
 
@@ -71,7 +72,8 @@ namespace Kafka.Client.Producers.Partitioning
         /// <param name="config">The config.</param>
         /// <param name="callback">The callback invoked when new broker is added.</param>
         public ZKBrokerPartitionInfo(ProducerConfiguration config, Action<int, string, int> callback)
-            : this(new ZooKeeperClient(config.ZooKeeper.ZkConnect, config.ZooKeeper.ZkSessionTimeoutMs, ZooKeeperStringSerializer.Serializer, config.ZooKeeper.ZkConnectionTimeoutMs))
+            : this(new ZooKeeperClient(config.ZooKeeper.ZkConnect, config.ZooKeeper.ZkSessionTimeoutMs, 
+                ZooKeeperStringSerializer.Serializer, config.ZooKeeper.ZkConnectionTimeoutMs), callback)
         {
             this.callback = callback;
         }

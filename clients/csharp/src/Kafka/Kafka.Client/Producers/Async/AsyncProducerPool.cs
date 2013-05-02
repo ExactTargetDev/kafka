@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+using Kafka.Client.Exceptions;
+
 namespace Kafka.Client.Producers.Async
 {
     using System;
@@ -168,7 +170,14 @@ namespace Kafka.Client.Producers.Async
             foreach (var broker in distinctBrokers)
             {
                 Logger.DebugFormat(CultureInfo.CurrentCulture, "Fetching async producer for broker id: {0}", broker.Key);
-                var producer = this.asyncProducers[broker.Key];
+                IAsyncProducer producer;                    
+                if (!asyncProducers.TryGetValue(broker.Key, out producer))
+                {
+                    var exception = new IllegalStateException(string.Format("Cannot find broker {0} in async producer collection", broker.Key));
+                    exception.Data.Add("brokerId", broker.Key);
+                   throw exception;
+                }
+
                 IEnumerable<ProducerRequest> requests = broker.Value.Select(x => new ProducerRequest(
                     x.Topic,
                     x.BidPid.PartId,
@@ -188,6 +197,8 @@ namespace Kafka.Client.Producers.Async
         {
             this.EnsuresNotDisposed();
             Guard.NotNull(broker, "broker");
+            if (asyncProducers.ContainsKey(broker.Id)) return;
+
             var asyncConfig = new AsyncProducerConfiguration(this.Config, broker.Id, broker.Host, broker.Port)
                 {
                     SerializerClass = this.Config.SerializerClass

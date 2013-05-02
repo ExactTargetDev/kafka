@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+using Kafka.Client.Exceptions;
+
 namespace Kafka.Client.Producers.Sync
 {
     using System;
@@ -167,7 +169,14 @@ namespace Kafka.Client.Producers.Sync
             foreach (var broker in distinctBrokers)
             {
                 Logger.DebugFormat(CultureInfo.CurrentCulture, "Fetching sync producer for broker id: {0}", broker.Key);
-                ISyncProducer producer = this.syncProducers[broker.Key];
+                
+                ISyncProducer producer;
+                if (!syncProducers.TryGetValue(broker.Key, out producer))
+                {
+                    var exception = new IllegalStateException(string.Format("Cannot find broker {0} in sync producer collection", broker.Key));
+                    exception.Data.Add("brokerId", broker.Key);
+                    throw exception;
+                }
                 IEnumerable<ProducerRequest> requests = broker.Value.Select(x => new ProducerRequest(
                     x.Topic,
                     x.BidPid.PartId,
@@ -192,6 +201,8 @@ namespace Kafka.Client.Producers.Sync
         {
             this.EnsuresNotDisposed();
             Guard.NotNull(broker, "broker");
+
+            if (syncProducers.ContainsKey(broker.Id)) return;
 
             var syncConfig = new SyncProducerConfiguration(this.Config, broker.Id, broker.Host, broker.Port);
             var syncProducer = new SyncProducer(syncConfig);
