@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+using Kafka.Client.Utils;
+
 namespace Kafka.Client.Exceptions
 {
     using System;
@@ -24,34 +26,9 @@ namespace Kafka.Client.Exceptions
     /// </summary>
     public class KafkaException : Exception
     {
-        /// <summary>
-        /// No error occurred.
-        /// </summary>
-        public const int NoError = 0;
-
-        /// <summary>
-        /// The offset requested was out of range.
-        /// </summary>
-        public const int OffsetOutOfRangeCode = 1;
-
-        /// <summary>
-        /// The message was invalid.
-        /// </summary>
-        public const int InvalidMessageCode = 2;
-
-        /// <summary>
-        /// The wrong partition.
-        /// </summary>
-        public const int WrongPartitionCode = 3;
-
-        /// <summary>
-        /// Invalid message size.
-        /// </summary>
-        public const int InvalidRetchSizeCode = 4;
-
         public KafkaException()
         {
-            ErrorCode = NoError;
+            ErrorCode = ErrorMapping.NoError;
         }
 
         /// <summary>
@@ -75,26 +52,23 @@ namespace Kafka.Client.Exceptions
         /// <returns>A string message representation </returns>
         private static string GetMessage(int errorCode)
         {
-            if (errorCode == OffsetOutOfRangeCode)
+            if (errorCode == ErrorMapping.OffsetOutOfRangeCode)
             {
                 return "Offset out of range";
             }
-            else if (errorCode == InvalidMessageCode)
+            if (errorCode == ErrorMapping.InvalidMessageCode)
             {
                 return "Invalid message";
             }
-            else if (errorCode == WrongPartitionCode)
+            if (errorCode == ErrorMapping.WrongPartitionCode)
             {
                 return "Wrong partition";
             }
-            else if (errorCode == InvalidRetchSizeCode)
+            if (errorCode == ErrorMapping.InvalidFetchSizeCode)
             {
                 return "Invalid message size";
             }
-            else
-            {
-                return "Unknown error";
-            }
+            return "Unknown error";
         }
     }
 }

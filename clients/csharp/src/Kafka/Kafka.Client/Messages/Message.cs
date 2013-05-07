@@ -53,7 +53,7 @@ namespace Kafka.Client.Messages
                     case 1:
                         return Messages.CompressionCodec.GetCompressionCodec(Attributes & CompressionCodeMask);
                     default:
-                        throw new KafkaException(KafkaException.InvalidMessageCode);
+                        throw new KafkaException(ErrorMapping.InvalidMessageCode);
                 }
             }
         }
@@ -292,7 +292,7 @@ namespace Kafka.Client.Messages
 
             if (size != readed)
             {
-                throw new KafkaException(KafkaException.InvalidRetchSizeCode);
+                throw new KafkaException(ErrorMapping.InvalidFetchSizeCode);
             }
 
             return result;

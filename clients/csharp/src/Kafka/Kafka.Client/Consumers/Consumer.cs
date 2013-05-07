@@ -203,7 +203,7 @@ namespace Kafka.Client.Consumers
                         }
 
                         short errorCode = conn.Reader.ReadInt16();
-                        if (errorCode != KafkaException.NoError)
+                        if (errorCode != ErrorMapping.NoError)
                         {
                             throw new KafkaException(errorCode);
                         }
