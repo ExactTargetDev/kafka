@@ -19,6 +19,8 @@ namespace Kafka.Client
 {
     using System;
     using System.IO;
+    using System.Runtime.InteropServices;
+    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
 
@@ -37,6 +39,10 @@ namespace Kafka.Client
 
         private readonly int socketTimeout;
 
+        private readonly ulong idleTimeToKeepAlive;
+
+        private readonly ulong keepAliveInterval;
+
         private readonly TcpClient client;
 
         private volatile bool disposed;
@@ -46,10 +52,16 @@ namespace Kafka.Client
         /// </summary>
         /// <param name="server">The server to connect to.</param>
         /// <param name="port">The port to connect to.</param>
-        public KafkaConnection(string server, int port, int bufferSize, int socketTimeout)
+        /// <param name="bufferSize"></param>
+        /// <param name="socketTimeout"></param>
+        /// <param name="idleTimeToKeepAlive">idle time until keepalives (ms)</param>
+        /// <param name="keepAliveInterval">interval between keepalives(ms)</param>
+        public KafkaConnection(string server, int port, int bufferSize, int socketTimeout, long idleTimeToKeepAlive = 900000, long keepAliveInterval = 75000)
         {
             this.bufferSize = bufferSize;
             this.socketTimeout = socketTimeout;
+            this.idleTimeToKeepAlive = (ulong)idleTimeToKeepAlive;
+            this.keepAliveInterval = (ulong)keepAliveInterval;
 
             try
             {
@@ -61,7 +73,13 @@ namespace Kafka.Client
                         ReceiveBufferSize = bufferSize,
                         SendBufferSize = bufferSize
                     };
+
+
+
                 var stream = this.client.GetStream();
+
+                SetKeepAlive();
+
                 this.Reader = new KafkaBinaryReader(stream);
             }
             catch (Exception e)
@@ -72,6 +90,14 @@ namespace Kafka.Client
         }
 
         public KafkaBinaryReader Reader { get; private set; }
+
+        private IPEndPoint RemoteEndPoint
+        {
+            get
+            {
+                return (IPEndPoint)this.client.Client.RemoteEndPoint;
+            }
+        }
 
         /// <summary>
         /// Writes a producer request to the server asynchronously.
@@ -167,9 +193,20 @@ namespace Kafka.Client
         {
             try
             {
-                NetworkStream stream = this.client.GetStream();
-                //// Send the message to the connected TcpServer. 
-                stream.Write(data, 0, data.Length);
+                Socket s = this.client.Client;
+
+                ////Make sure remote socket is sti
+                if (!(s.Poll(1000, SelectMode.SelectRead) && (s.Available == 0)) || !s.Connected)
+                {
+                    NetworkStream stream = this.client.GetStream();
+                    //// Send the message to the connected TcpServer. 
+                    stream.Write(data, 0, data.Length);
+                }
+                else
+                {
+                    IPEndPoint remoteEndPoint = (IPEndPoint)this.client.Client.RemoteEndPoint;
+                    throw new IOException(String.Format("Socket {0}:{1} is no longer available.", remoteEndPoint.Address.ToString(), remoteEndPoint.Port.ToString()));
+                }
             }
             catch (InvalidOperationException e)
             {
@@ -207,6 +244,36 @@ namespace Kafka.Client
             {
                 throw new ObjectDisposedException(this.GetType().Name);
             }
+        }
+
+        /// <summary>
+        /// Sets socket options on TCP client to enable keepalive 
+        /// </summary>
+        public void SetKeepAlive()
+        {
+            int BytesPerLong = 4;
+            int BitsPerByte = 8;
+
+            var input = new[] {
+                (this.idleTimeToKeepAlive == 0 || this.keepAliveInterval == 0) ? 0UL : 1UL, // on or off
+                                                    this.idleTimeToKeepAlive,
+                                                    this.keepAliveInterval
+            };
+
+            byte[] inValue = new byte[3 * BytesPerLong];
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                inValue[i * BytesPerLong + 3] = (byte)(input[i] >> ((BytesPerLong - 1) * BitsPerByte) & 0xff);
+                inValue[i * BytesPerLong + 2] = (byte)(input[i] >> ((BytesPerLong - 2) * BitsPerByte) & 0xff);
+                inValue[i * BytesPerLong + 1] = (byte)(input[i] >> ((BytesPerLong - 3) * BitsPerByte) & 0xff);
+                inValue[i * BytesPerLong + 0] = (byte)(input[i] >> ((BytesPerLong - 4) * BitsPerByte) & 0xff);
+            }
+
+            byte[] outValue = BitConverter.GetBytes(0);
+
+            this.client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            this.client.Client.IOControl(IOControlCode.KeepAliveValues, inValue, outValue);
         }
     }
 }
