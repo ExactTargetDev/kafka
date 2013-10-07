@@ -249,7 +249,7 @@ namespace Kafka.Client
         /// <summary>
         /// Sets socket options on TCP client to enable keepalive 
         /// </summary>
-        public void SetKeepAlive()
+        private void SetKeepAlive()
         {
             int BytesPerLong = 4;
             int BitsPerByte = 8;
