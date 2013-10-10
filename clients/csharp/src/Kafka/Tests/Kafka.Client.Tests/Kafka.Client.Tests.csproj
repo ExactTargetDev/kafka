@@ -100,6 +100,7 @@
     <Compile Include="Request\OffsetRequestTests.cs" />
     <Compile Include="Request\ProducerRequestTests.cs" />
     <Compile Include="Util\BitWorksTests.cs" />
+    <Compile Include="Util\ExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Kafka.Client\Kafka.Client.csproj">
