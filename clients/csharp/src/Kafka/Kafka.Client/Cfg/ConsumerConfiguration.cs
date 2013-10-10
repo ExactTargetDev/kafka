@@ -18,11 +18,13 @@ namespace Kafka.Client.Cfg
 {
     using Kafka.Client.Exceptions;
     using Kafka.Client.Requests;
+    using Kafka.Client.Utils;
     using System.Configuration;
     using System.Net;
     using System.Globalization;
     using System.Text;
     using System.Xml.Linq;
+    using System.Collections.Generic;
 
 
     /// <summary>
@@ -192,8 +194,11 @@ namespace Kafka.Client.Cfg
                 throw new ConfigurationErrorsException();
             }
 
+            //Need to shuffle servers to prevent hotspotting individual zookeeper nodes
+            var shuffledServers = config.Servers.Shuffle();
+
             var sb = new StringBuilder();
-            foreach (ZooKeeperServerConfigurationElement server in config.Servers)
+            foreach (ZooKeeperServerConfigurationElement server in shuffledServers)
             {
                 sb.Append(GetIpAddress(server.Host));
                 sb.Append(':');
