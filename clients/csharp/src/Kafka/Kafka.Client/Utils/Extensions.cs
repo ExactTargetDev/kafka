@@ -18,6 +18,7 @@
 namespace Kafka.Client.Utils
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -44,6 +45,33 @@ namespace Kafka.Client.Utils
 
             Func<T, object> compiled = selector.Compile();
             return String.Join(separator, items.Select(compiled));
+        }
+
+        public static IEnumerable Shuffle(this IEnumerable enumerable)
+        {
+            List<object> tmpList = new List<object>();
+            var r = new Random();
+            int j = 0;
+            object tmp;
+
+            foreach (object o in enumerable)
+            {
+                tmpList.Add(o);
+            }
+
+            for (int i = tmpList.Count(); i > 1; i--)
+            {
+                // Pick random element to swap.
+                j = r.Next(i); // 0 <= j <= i-1
+                // Swap.
+                tmp = tmpList[j];
+                tmpList[j] = tmpList[i - 1];
+                tmpList[i - 1] = tmp;
+            }
+
+            return (IEnumerable)tmpList;
+
+      
         }
     }
 }
