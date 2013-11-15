@@ -33,6 +33,14 @@ namespace Kafka.Client.Cfg
 
         public const int DefaultReconnectTimeInterval = 1000 * 1000 * 10;
 
+        public const long DefaultIdleTimeToKeepAlive = 900 * 1000;
+
+        public const long DefaultKeepAliveInterval = 75 * 1000;
+
+        public const long DefaultSocketPollingTimeout = 1000;
+
+        public const SocketPollingLevel DefaultSocketPollingLevel = SocketPollingLevel.SINGLE;
+
         public SyncProducerConfiguration()
         {
             this.BufferSize = DefaultBufferSize;
@@ -41,6 +49,10 @@ namespace Kafka.Client.Cfg
             this.MaxMessageSize = DefaultMaxMessageSize;
             this.ReconnectInterval = DefaultReconnectInterval;
             this.ReconnectTimeInterval = DefaultReconnectTimeInterval;
+            this.IdleTimeToKeepAlive = DefaultIdleTimeToKeepAlive;
+            this.KeepAliveInterval = DefaultKeepAliveInterval;
+            this.SocketPollingTimeout = DefaultSocketPollingTimeout;
+            this.SocketPollingLevel = DefaultSocketPollingLevel;
         }
 
         public SyncProducerConfiguration(ProducerConfiguration config, int id, string host, int port) 
@@ -56,6 +68,10 @@ namespace Kafka.Client.Cfg
             this.MaxMessageSize = config.MaxMessageSize;
             this.ReconnectInterval = config.ReconnectInterval;
             this.ReconnectTimeInterval = config.ReconnectTimeInterval;
+            this.IdleTimeToKeepAlive = config.IdleTimeToKeepAlive;
+            this.KeepAliveInterval = config.KeepAliveInterval;
+            this.SocketPollingTimeout = config.SocketPollingTimeout;
+            this.SocketPollingLevel = config.SocketPollingLevel;
         }
 
         public int BufferSize { get; set; }
@@ -75,5 +91,13 @@ namespace Kafka.Client.Cfg
         public int ReconnectInterval { get; set; }
 
         public int ReconnectTimeInterval { get; set; }
+
+        public long IdleTimeToKeepAlive { get; set; }
+
+        public long KeepAliveInterval { get; set; }
+
+        public long SocketPollingTimeout { get; set; }
+
+        public SocketPollingLevel SocketPollingLevel { get; set; }
     }
 }

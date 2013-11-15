@@ -43,6 +43,10 @@ namespace Kafka.Client
 
         private readonly ulong keepAliveInterval;
 
+        private readonly long socketPollingTimeout;
+
+        private readonly SocketPollingLevel socketPollingLevel;
+
         private readonly TcpClient client;
 
         private volatile bool disposed;
@@ -56,12 +60,14 @@ namespace Kafka.Client
         /// <param name="socketTimeout"></param>
         /// <param name="idleTimeToKeepAlive">idle time until keepalives (ms)</param>
         /// <param name="keepAliveInterval">interval between keepalives(ms)</param>
-        public KafkaConnection(string server, int port, int bufferSize, int socketTimeout, long idleTimeToKeepAlive = 900000, long keepAliveInterval = 75000)
+        public KafkaConnection(string server, int port, int bufferSize, int socketTimeout, long idleTimeToKeepAlive, long keepAliveInterval, long socketPollingTimeout, SocketPollingLevel socketPollingLevel)
         {
             this.bufferSize = bufferSize;
             this.socketTimeout = socketTimeout;
             this.idleTimeToKeepAlive = (ulong)idleTimeToKeepAlive;
             this.keepAliveInterval = (ulong)keepAliveInterval;
+            this.socketPollingTimeout = socketPollingTimeout;
+            this.socketPollingLevel = socketPollingLevel;
 
             try
             {
@@ -73,8 +79,6 @@ namespace Kafka.Client
                         ReceiveBufferSize = bufferSize,
                         SendBufferSize = bufferSize
                     };
-
-
 
                 var stream = this.client.GetStream();
 
@@ -149,6 +153,12 @@ namespace Kafka.Client
                 var ctx = new RequestContext<ProducerRequest>(stream, request);
 
                 byte[] data = request.RequestBuffer.GetBuffer();
+
+                if (this.socketPollingLevel == SocketPollingLevel.DOUBLE)
+                {
+                    PollSocket();
+                }
+
                 stream.BeginWrite(
                     data,
                     0,
@@ -160,6 +170,13 @@ namespace Kafka.Client
                         context.NetworkStream.EndWrite(asyncResult);
                     },
                     ctx);
+
+                if (this.socketPollingLevel == SocketPollingLevel.SINGLE ||
+                    this.socketPollingLevel == SocketPollingLevel.DOUBLE)
+                {
+                    PollSocket();
+                }
+
             }
             catch (InvalidOperationException e)
             {
@@ -182,7 +199,18 @@ namespace Kafka.Client
         {
             this.EnsuresNotDisposed();
             Guard.NotNull(request, "request");
+            if (this.socketPollingLevel == SocketPollingLevel.DOUBLE)
+            {
+                PollSocket();
+            }
+
             this.Write(request.RequestBuffer.GetBuffer());
+
+            if (this.socketPollingLevel == SocketPollingLevel.SINGLE ||
+                    this.socketPollingLevel == SocketPollingLevel.DOUBLE)
+            {
+                PollSocket();
+            }
         }
 
         /// <summary>
@@ -193,20 +221,9 @@ namespace Kafka.Client
         {
             try
             {
-                Socket s = this.client.Client;
-
-                ////Make sure remote socket is sti
-                if (!(s.Poll(1000, SelectMode.SelectRead) && (s.Available == 0)) || !s.Connected)
-                {
-                    NetworkStream stream = this.client.GetStream();
-                    //// Send the message to the connected TcpServer. 
-                    stream.Write(data, 0, data.Length);
-                }
-                else
-                {
-                    IPEndPoint remoteEndPoint = (IPEndPoint)this.client.Client.RemoteEndPoint;
-                    throw new IOException(String.Format("Socket {0}:{1} is no longer available.", remoteEndPoint.Address.ToString(), remoteEndPoint.Port.ToString()));
-                }
+                NetworkStream stream = this.client.GetStream();
+                //// Send the message to the connected TcpServer. 
+                stream.Write(data, 0, data.Length);      
             }
             catch (InvalidOperationException e)
             {
@@ -243,6 +260,19 @@ namespace Kafka.Client
             if (this.disposed)
             {
                 throw new ObjectDisposedException(this.GetType().Name);
+            }
+        }
+
+        /// <summary>
+        /// Ensures that socket is available for writing
+        /// </summary>
+        private void PollSocket()
+        { 
+            if((!this.client.Client.Poll(this.socketTimeout, SelectMode.SelectRead) 
+                && !(this.client.Client.Available == 0))
+                    || !this.client.Client.Connected)
+            {
+                throw new IOException(String.Format("Socket {0}:{1} is no longer available.", RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port.ToString()));    
             }
         }
 

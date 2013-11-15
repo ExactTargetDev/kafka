@@ -167,6 +167,7 @@
     <Compile Include="Producers\Async\MessageSent.cs" />
     <Compile Include="Producers\Partitioning\DefaultStringPartitioner.cs" />
     <Compile Include="Producers\Producer.StrMsg.cs" />
+    <Compile Include="SocketPollingLevel.cs" />
     <Compile Include="Producers\Sync\SyncProducerPool.cs" />
     <Compile Include="Serialization\StringEncoder.cs" />
     <Compile Include="Serialization\IWritable.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="Serialization\DefaultEncoder.cs" />
     <Compile Include="Serialization\KafkaBinaryReader.cs" />
     <Compile Include="Serialization\KafkaBinaryWriter.cs" />
+    <Compile Include="Utils\ConfigurationEnumConverter.cs" />
     <Compile Include="Utils\ErrorMapping.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Guard.cs" />

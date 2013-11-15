@@ -101,7 +101,11 @@ namespace Kafka.Client.Consumers
                         this.host,
                         this.port,
                         this.config.BufferSize,
-                        this.config.SocketTimeout))
+                        this.config.SocketTimeout,
+                        this.config.IdleTimeToKeepAlive,
+                        this.config.KeepAliveInterval,
+                        this.config.SocketPollingTimeout,
+                        this.config.SocketPollingLevel))
                     {
                         conn.Write(request);
                         int size = conn.Reader.ReadInt32();
@@ -149,7 +153,11 @@ namespace Kafka.Client.Consumers
                         this.host,
                         this.port,
                         this.config.BufferSize,
-                        this.config.SocketTimeout))
+                        this.config.SocketTimeout,
+                        this.config.IdleTimeToKeepAlive,
+                        this.config.KeepAliveInterval,
+                        this.config.SocketPollingTimeout,
+                        this.config.SocketPollingLevel))
                     {
                         conn.Write(request);
                         int size = conn.Reader.ReadInt32();
@@ -193,7 +201,11 @@ namespace Kafka.Client.Consumers
                         this.host,
                         this.port,
                         this.config.BufferSize,
-                        this.config.SocketTimeout))
+                        this.config.SocketTimeout,
+                        this.config.IdleTimeToKeepAlive,
+                        this.config.KeepAliveInterval,
+                        this.config.SocketPollingTimeout,
+                        this.config.SocketPollingLevel))
                     {
                         conn.Write(request);
                         int size = conn.Reader.ReadInt32();

@@ -119,7 +119,7 @@ namespace Kafka.Client.ZooKeeperIntegration
         /// Default serializer is string UTF-8 serializer.
         /// It is recommended to use quite large sessions timeouts for ZooKeeper.
         /// </remarks>
-        public ZooKeeperClient(
+        public  ZooKeeperClient(
             string servers, 
             int sessionTimeout, 
             IZooKeeperSerializer serializer,

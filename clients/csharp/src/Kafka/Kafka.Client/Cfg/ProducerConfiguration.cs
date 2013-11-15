@@ -52,6 +52,10 @@ namespace Kafka.Client.Cfg
             this.SerializerClass = AsyncProducerConfiguration.DefaultSerializerClass;
             this.ReconnectInterval = SyncProducerConfiguration.DefaultReconnectInterval;
             this.ReconnectTimeInterval = SyncProducerConfiguration.DefaultReconnectTimeInterval;
+            this.IdleTimeToKeepAlive = SyncProducerConfiguration.DefaultIdleTimeToKeepAlive;
+            this.KeepAliveInterval = SyncProducerConfiguration.DefaultKeepAliveInterval;
+            this.SocketPollingTimeout = SyncProducerConfiguration.DefaultSocketPollingTimeout;
+            this.SocketPollingLevel = SyncProducerConfiguration.DefaultSocketPollingLevel;
         }
 
         public ProducerConfiguration(XElement xml) : this(ProducerConfigurationSection.FromXml(xml))
@@ -82,6 +86,10 @@ namespace Kafka.Client.Cfg
             this.SerializerClass = config.Serializer;
             this.ReconnectInterval = config.ReconnectInterval;
             this.ReconnectTimeInterval = config.ReconnectTimeInterval;
+            this.IdleTimeToKeepAlive = config.IdleTimeToKeepAlive;
+            this.KeepAliveInterval = config.KeepAliveInterval;
+            this.SocketPollingTimeout = config.SocketPollingTimeout;
+            this.SocketPollingLevel = config.SocketPollingLevel;
             Validate(config);
             if (config.ZooKeeperServers.ElementInformation.IsPresent)
             {
@@ -189,6 +197,15 @@ namespace Kafka.Client.Cfg
         public int ReconnectInterval { get; set; }
 
         public int ReconnectTimeInterval { get; set; }
+
+        public long IdleTimeToKeepAlive { get; set; }
+
+        public long KeepAliveInterval { get; set; }
+
+        public long SocketPollingTimeout { get; set; }
+
+        public SocketPollingLevel SocketPollingLevel { get; set; }
+ 
 
         private void SetZooKeeperServers(ZooKeeperConfigurationElement config)
         {

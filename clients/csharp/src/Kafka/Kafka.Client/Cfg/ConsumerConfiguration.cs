@@ -52,6 +52,14 @@ namespace Kafka.Client.Cfg
 
         public const int DefaultMaxQueuedChunks = 10;
 
+        public const long DefaultIdleTimeToKeepAlive = 900 * 1000;
+
+        public const long DefaultKeepAliveInterval = 75 * 1000;
+
+        public const long DefaultSocketPollingTimeout = 1000;
+
+        public const SocketPollingLevel DefaultSocketPollingLevel = SocketPollingLevel.NONE;
+
         public ConsumerConfiguration()
         {
             this.NumberOfTries = DefaultNumberOfTries;
@@ -62,6 +70,10 @@ namespace Kafka.Client.Cfg
             this.FetchSize = DefaultFetchSize;
             this.BackOffIncrement = DefaultBackOffIncrement;
             this.MaxQueuedChunks = DefaultMaxQueuedChunks;
+            this.IdleTimeToKeepAlive = DefaultIdleTimeToKeepAlive;
+            this.KeepAliveInterval = DefaultKeepAliveInterval;
+            this.SocketPollingTimeout = DefaultSocketPollingTimeout;
+            this.SocketPollingLevel = DefaultSocketPollingLevel;
         }
 
         public ConsumerConfiguration(string host, int port)
@@ -84,6 +96,10 @@ namespace Kafka.Client.Cfg
             this.SocketTimeout = config.SocketTimeout;
             this.BufferSize = config.BufferSize;
             this.MaxQueuedChunks = config.MaxQueuedChunks;
+            this.IdleTimeToKeepAlive = config.IdleTimeToKeepAlive;
+            this.KeepAliveInterval = config.KeepAliveInterval;
+            this.SocketPollingTimeout = config.SocketPollingTimeout;
+            this.SocketPollingLevel = config.SocketPollingLevel;
             if (config.Broker.ElementInformation.IsPresent)
             {
                 this.SetBrokerConfiguration(config.Broker);
@@ -138,6 +154,14 @@ namespace Kafka.Client.Cfg
         public ZooKeeperConfiguration ZooKeeper { get; set; }
 
         public BrokerConfiguration Broker { get; set; }
+
+        public long IdleTimeToKeepAlive { get; set; }
+
+        public long KeepAliveInterval { get; set; }
+
+        public long SocketPollingTimeout { get; set; }
+
+        public SocketPollingLevel SocketPollingLevel { get; set; }
 
         private static void Validate(ConsumerConfigurationSection config)
         {
