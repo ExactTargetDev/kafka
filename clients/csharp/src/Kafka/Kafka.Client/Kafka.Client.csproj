@@ -109,7 +109,8 @@
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="ZooKeeperNet">
+    <Reference Include="ZooKeeperNet, Version=3.3.4.7, Culture=neutral, PublicKeyToken=fefd2c046da35b56, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\lib\zookeeper\ZooKeeperNet.dll</HintPath>
     </Reference>
   </ItemGroup>
