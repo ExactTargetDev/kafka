@@ -17,7 +17,10 @@
 
 namespace Kafka.Client.Cfg
 {
+    using System;
+    using System.ComponentModel;
     using System.Configuration;
+    using Kafka.Client.Utils;
     using Kafka.Client.Producers;
     using System.Xml.Linq;
 
@@ -151,6 +154,55 @@ namespace Kafka.Client.Cfg
             get
             {
                 return (int)this["reconnectTimeInterval"];
+            }
+        }
+
+        [ConfigurationProperty(
+            "idleTimeToKeepAlive",
+            DefaultValue = SyncProducerConfiguration.DefaultIdleTimeToKeepAlive,
+            IsRequired = false)]
+        public long IdleTimeToKeepAlive
+        {
+            get
+            {
+                return (long)this["idleTimeToKeepAlive"];
+            }
+        }
+
+        [ConfigurationProperty(
+            "keepAliveInterval",
+            DefaultValue = SyncProducerConfiguration.DefaultKeepAliveInterval,
+            IsRequired = false)]
+        public long KeepAliveInterval
+        {
+            get
+            {
+                return (long)this["keepAliveInterval"];
+            }
+        }
+
+        [ConfigurationProperty(
+        "socketPollingTimeout",
+        DefaultValue = SyncProducerConfiguration.DefaultSocketPollingTimeout,
+        IsRequired = false)]
+        public long SocketPollingTimeout
+        {
+            get
+            {
+                return (long)this["socketPollingTimeout"];
+            }
+        }
+
+        [ConfigurationProperty(
+        "socketPollingLevel",
+        DefaultValue = SyncProducerConfiguration.DefaultSocketPollingLevel,
+        IsRequired = false)]
+        [TypeConverter(typeof(ConfigurationEnumConverter<SocketPollingLevel>))]
+        public SocketPollingLevel SocketPollingLevel
+        {
+            get
+            {
+                return this["socketPollingLevel"] == null ? SyncProducerConfiguration.DefaultSocketPollingLevel : (SocketPollingLevel)this["socketPollingLevel"];
             }
         }
 

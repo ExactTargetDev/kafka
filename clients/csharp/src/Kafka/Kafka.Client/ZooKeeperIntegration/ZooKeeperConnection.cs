@@ -193,16 +193,27 @@ namespace Kafka.Client.ZooKeeperIntegration
         /// </returns>
         public IList<string> GetChildren(string path, bool watch)
         {
+            IList<String> output = null;
+            
             Guard.NotNullNorEmpty(path, "path");
 
             this.EnsuresNotDisposed();
-            return new List<string> (this.Client.GetChildren(path, watch)).AsReadOnly();
+            try
+            {
+                output = new List<string>(this.Client.GetChildren(path, watch)).AsReadOnly();
+            }
+            catch (NullReferenceException ex)
+            {
+                throw new ZooKeeperException(string.Format("No znodes available at path '{0}'.", path), ex);
+            }
+
+            return output;
         }
 
         /// <summary>
         /// Fetches data from a given path in ZooKeeper
         /// </summary>
-        /// <param name="path">
+        /// <param name="path">     
         /// The given path.
         /// </param>
         /// <param name="stats">

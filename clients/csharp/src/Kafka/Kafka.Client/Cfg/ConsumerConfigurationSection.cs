@@ -16,9 +16,12 @@
  */
 namespace Kafka.Client.Cfg
 {
+    using System;
+    using System.ComponentModel;
     using System.Configuration;
     using Kafka.Client.Requests;
     using System.Xml.Linq;
+    using Kafka.Client.Utils;
 
 
     public class ConsumerConfigurationSection : ConfigurationSection
@@ -137,6 +140,55 @@ namespace Kafka.Client.Cfg
             get
             {
                 return (BrokerConfigurationElement)this["broker"];
+            }
+        }
+
+        [ConfigurationProperty(
+        "idleTimeToKeepAlive",
+        DefaultValue = ConsumerConfiguration.DefaultIdleTimeToKeepAlive,
+        IsRequired = false)]
+        public long IdleTimeToKeepAlive
+        {
+            get
+            {
+                return (long)this["idleTimeToKeepAlive"];
+            }
+        }
+
+        [ConfigurationProperty(
+            "keepAliveInterval",
+            DefaultValue = ConsumerConfiguration.DefaultKeepAliveInterval,
+            IsRequired = false)]
+        public long KeepAliveInterval
+        {
+            get
+            {
+                return (long)this["keepAliveInterval"];
+            }
+        }
+
+        [ConfigurationProperty(
+        "socketPollingTimeout",
+        DefaultValue = ConsumerConfiguration.DefaultSocketPollingTimeout,
+        IsRequired = false)]
+        public long SocketPollingTimeout
+        {
+            get
+            {
+                return (long)this["socketPollingTimeout"];
+            }
+        }
+
+        [ConfigurationProperty(
+        "socketPollingLevel",
+        DefaultValue = ConsumerConfiguration.DefaultSocketPollingLevel,
+        IsRequired = false)]
+        [TypeConverter(typeof(ConfigurationEnumConverter<SocketPollingLevel>))]
+        public SocketPollingLevel SocketPollingLevel
+        {
+            get
+            {
+                return this["socketPollingLevel"] == null ? ConsumerConfiguration.DefaultSocketPollingLevel : (SocketPollingLevel)this["socketPollingLevel"];
             }
         }
 

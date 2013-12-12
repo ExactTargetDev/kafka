@@ -14,32 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-namespace Kafka.Client.Exceptions
+namespace Kafka.Client.Utils
 {
     using System;
-    using System.Runtime.Serialization;
-
-    [Serializable]
-    public class ZooKeeperException : Exception
+    using System.ComponentModel;
+    using System.Globalization;
+    using System.Configuration;
+    using System.Collections.Generic;
+    
+    public class ConfigurationEnumConverter<T> : ConfigurationConverterBase
     {
-        public ZooKeeperException()
+        public override object ConvertFrom(
+        ITypeDescriptorContext ctx, CultureInfo ci, object data)
         {
-        }
-
-        public ZooKeeperException(string message)
-            : base(message)
-        {
-        }
-
-        public ZooKeeperException(string message, Exception exc)
-            : base(message, exc)
-        {
-        }
-
-        protected ZooKeeperException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
+            return Enum.Parse(typeof(T), (string)data, true);
         }
     }
 }

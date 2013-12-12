@@ -156,7 +156,14 @@ namespace Kafka.Client.Producers.Sync
             {
                 try
                 {
-                    connection = new KafkaConnection(Config.Host, Config.Port, Config.BufferSize, Config.SocketTimeout);
+                    connection = new KafkaConnection(   Config.Host, 
+                                                        Config.Port, 
+                                                        Config.BufferSize, 
+                                                        Config.SocketTimeout, 
+                                                        Config.IdleTimeToKeepAlive, 
+                                                        Config.KeepAliveInterval,
+                                                        Config.SocketPollingTimeout,
+                                                        Config.SocketPollingLevel);
                     Logger.Info("Connected to " + Config.Host + ":" + Config.Port + " for producing");
                 }
                 catch (Exception e)
@@ -187,7 +194,7 @@ namespace Kafka.Client.Producers.Sync
         private void Disconnect()
         {
             try
-            {
+            {   
                 if (connection != null)
                 {
                     Logger.Info("Disconnecting from " + Config.Host + ":" + Config.Port);

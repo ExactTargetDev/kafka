@@ -109,7 +109,8 @@
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="ZooKeeperNet">
+    <Reference Include="ZooKeeperNet, Version=3.3.4.7, Culture=neutral, PublicKeyToken=fefd2c046da35b56, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\lib\zookeeper\ZooKeeperNet.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -167,6 +168,7 @@
     <Compile Include="Producers\Async\MessageSent.cs" />
     <Compile Include="Producers\Partitioning\DefaultStringPartitioner.cs" />
     <Compile Include="Producers\Producer.StrMsg.cs" />
+    <Compile Include="SocketPollingLevel.cs" />
     <Compile Include="Producers\Sync\SyncProducerPool.cs" />
     <Compile Include="Serialization\StringEncoder.cs" />
     <Compile Include="Serialization\IWritable.cs" />
@@ -181,6 +183,7 @@
     <Compile Include="Serialization\DefaultEncoder.cs" />
     <Compile Include="Serialization\KafkaBinaryReader.cs" />
     <Compile Include="Serialization\KafkaBinaryWriter.cs" />
+    <Compile Include="Utils\ConfigurationEnumConverter.cs" />
     <Compile Include="Utils\ErrorMapping.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Guard.cs" />

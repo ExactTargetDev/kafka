@@ -73,7 +73,11 @@ namespace Kafka.Client.Producers.Async
                 this.Config.Host,
                 this.Config.Port,
                 this.Config.BufferSize,
-                this.Config.SocketTimeout);
+                this.Config.SocketTimeout,
+                this.Config.IdleTimeToKeepAlive,
+                this.Config.KeepAliveInterval,
+                this.Config.SocketPollingTimeout,
+                this.Config.SocketPollingLevel);
         }
 
         /// <summary>
