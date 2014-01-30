@@ -165,7 +165,7 @@ namespace Kafka.Client.IntegrationTests
                 client.Subscribe(ZooKeeperClient.DefaultBrokerIdsPath, brokerTopicsListener);
                 WaitUntillIdle(client, 500);
                 client.CreatePersistent(brokerPath, true);
-                client.WriteData(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                client.WriteData(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                 WaitUntillIdle(client, 500);
                 client.UnsubscribeAll();
                 WaitUntillIdle(client, 500);
@@ -173,8 +173,8 @@ namespace Kafka.Client.IntegrationTests
             }
 
             Assert.IsTrue(brokers.ContainsKey(2345));
-            Assert.AreEqual("192.168.1.39", brokers[2345].Host);
-            Assert.AreEqual(9102, brokers[2345].Port);
+            Assert.AreEqual("172.16.66.2", brokers[2345].Host);
+            Assert.AreEqual(9092, brokers[2345].Port);
             Assert.AreEqual(2345, brokers[2345].Id);
         }
 
@@ -214,7 +214,7 @@ namespace Kafka.Client.IntegrationTests
                 var brokerTopicsListener = new BrokerTopicsListener(client, mappings, brokers, null);
                 client.Subscribe(ZooKeeperClient.DefaultBrokerIdsPath, brokerTopicsListener);
                 client.CreatePersistent(brokerPath, true);
-                client.WriteData(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                client.WriteData(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                 WaitUntillIdle(client, 500); 
                 Assert.IsTrue(brokers.ContainsKey(2345));
                 client.DeleteRecursive(brokerPath);
@@ -262,7 +262,7 @@ namespace Kafka.Client.IntegrationTests
                 client.Subscribe(ZooKeeperClient.DefaultBrokerIdsPath, brokerTopicsListener);
                 client.Subscribe(ZooKeeperClient.DefaultBrokerTopicsPath, brokerTopicsListener);
                 client.CreatePersistent(brokerPath, true);
-                client.WriteData(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                client.WriteData(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                 client.CreatePersistent(topicPath, true);
                 WaitUntillIdle(client, 500);
                 Assert.IsTrue(brokers.ContainsKey(2345));
@@ -370,7 +370,7 @@ namespace Kafka.Client.IntegrationTests
                 {
                     brokers = brokerPartitionInfo.GetAllBrokerInfo();
                     client.CreatePersistent(brokerPath, true);
-                    client.WriteData(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                    client.WriteData(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                     WaitUntillIdle(client, 500);
                     client.UnsubscribeAll();
                     WaitUntillIdle(client, 500);
@@ -381,8 +381,8 @@ namespace Kafka.Client.IntegrationTests
             Assert.NotNull(brokers);
             Assert.Greater(brokers.Count, 0);
             Assert.IsTrue(brokers.ContainsKey(2345));
-            Assert.AreEqual("192.168.1.39", brokers[2345].Host);
-            Assert.AreEqual(9102, brokers[2345].Port);
+            Assert.AreEqual("172.16.66.2", brokers[2345].Host);
+            Assert.AreEqual(9092, brokers[2345].Port);
             Assert.AreEqual(2345, brokers[2345].Id);
         }
 
@@ -403,7 +403,7 @@ namespace Kafka.Client.IntegrationTests
                     WaitUntillIdle(client, 500);
                     brokers = brokerPartitionInfo.GetAllBrokerInfo();
                     client.CreatePersistent(brokerPath, true);
-                    client.WriteData(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                    client.WriteData(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                     WaitUntillIdle(client, 500);
                     Assert.NotNull(brokers);
                     Assert.Greater(brokers.Count, 0);
@@ -440,7 +440,7 @@ namespace Kafka.Client.IntegrationTests
                         ReflectionHelper.GetInstanceField<IDictionary<string, SortedSet<Partition>>>(
                             "topicBrokerPartitions", brokerPartitionInfo);
                     client.CreatePersistent(brokerPath, true);
-                    client.WriteData(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                    client.WriteData(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                     client.CreatePersistent(topicPath, true);
                     WaitUntillIdle(client, 500);
                     Assert.IsTrue(brokers.ContainsKey(2345));

@@ -146,6 +146,7 @@
     <Compile Include="Exceptions\IllegalStateException.cs" />
     <Compile Include="Exceptions\InvalidMessageSizeException.cs" />
     <Compile Include="Exceptions\KafkaConnectionException.cs" />
+    <Compile Include="Exceptions\KafkaConnectionPoolException.cs" />
     <Compile Include="Exceptions\MessageSizeTooLargeException.cs" />
     <Compile Include="Exceptions\NoSuchElementException.cs" />
     <Compile Include="Exceptions\UnknownCodecException.cs" />
@@ -158,6 +159,8 @@
     <Compile Include="Exceptions\KafkaException.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="KafkaClusterConnectionPool.cs" />
+    <Compile Include="KafkaServerConnectionPool.cs" />
     <Compile Include="KafkaStopWatch.cs" />
     <Compile Include="Messages\BoundedBuffer.cs" />
     <Compile Include="Messages\CompressionCodec.cs" />

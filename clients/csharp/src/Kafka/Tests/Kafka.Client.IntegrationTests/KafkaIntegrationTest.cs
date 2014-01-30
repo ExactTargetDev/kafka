@@ -236,7 +236,7 @@ namespace Kafka.Client.IntegrationTests
         {
             var consumerConfig = this.ConsumerConfig1;
             ProducerSendsMessage();
-            Thread.Sleep(1000);
+            Thread.Sleep(3000);
             IConsumer consumer = new Consumer(consumerConfig);
             var request = new FetchRequest(CurrentTestTopic, 0, 0);
             BufferedMessageSet response = consumer.Fetch(request);
@@ -260,7 +260,7 @@ namespace Kafka.Client.IntegrationTests
             var config = this.ConsumerConfig1;
 
             ProducerSendMultiRequest();
-            Thread.Sleep(2000);
+            Thread.Sleep(5000);
             IConsumer cons = new Consumer(config);
             var request = new MultiFetchRequest(new List<FetchRequest>
             {

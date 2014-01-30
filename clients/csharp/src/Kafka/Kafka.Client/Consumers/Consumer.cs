@@ -51,13 +51,8 @@ namespace Kafka.Client.Consumers
         /// <param name="config">
         /// The consumer configuration.
         /// </param>
-        public Consumer(ConsumerConfiguration config)
+        public Consumer(ConsumerConfiguration config):this(config, config.Broker.Host, config.Broker.Port)
         {
-            Guard.NotNull(config, "config");
-
-            this.config = config;
-            this.host = config.Broker.Host;
-            this.port = config.Broker.Port;
         }
 
         /// <summary>
@@ -75,6 +70,15 @@ namespace Kafka.Client.Consumers
             this.config = config;
             this.host = host;
             this.port = port;
+
+            KafkaClusterConnectionPool.Init(this.config.MaxConnectionPoolSize,
+                         new TimeSpan(0, 0, this.config.ConnectionLifeSpan),
+                         this.config.BufferSize,
+                         this.config.SocketTimeout,
+                         this.config.IdleTimeToKeepAlive,
+                         this.config.KeepAliveInterval,
+                         this.config.SocketPollingTimeout,
+                         this.config.SocketPollingLevel);
         }
 
         /// <summary>
@@ -93,24 +97,19 @@ namespace Kafka.Client.Consumers
         public BufferedMessageSet Fetch(FetchRequest request)
         {
             short tryCounter = 1;
+            KafkaConnection conn = null;
+            int size = 0;
+            BufferedMessageSet messageSet = null;
+
             while (tryCounter <= this.config.NumberOfTries)
             {
                 try
                 {
-                    using (var conn = new KafkaConnection(
-                        this.host,
-                        this.port,
-                        this.config.BufferSize,
-                        this.config.SocketTimeout,
-                        this.config.IdleTimeToKeepAlive,
-                        this.config.KeepAliveInterval,
-                        this.config.SocketPollingTimeout,
-                        this.config.SocketPollingLevel))
-                    {
-                        conn.Write(request);
-                        int size = conn.Reader.ReadInt32();
-                        return BufferedMessageSet.ParseFrom(conn.Reader, size, request.Offset);
-                    }
+                    conn = KafkaClusterConnectionPool.GetConnection(this.host, this.port);
+                    conn.Write(request);
+                    size = conn.Reader.ReadInt32();
+                    messageSet = BufferedMessageSet.ParseFrom(conn.Reader, size, request.Offset);
+                    break;
                 }
                 catch (Exception ex)
                 {
@@ -123,9 +122,13 @@ namespace Kafka.Client.Consumers
                     tryCounter++;
                     Logger.InfoFormat(CultureInfo.CurrentCulture, "Fetch reconnect due to {0}", ex);
                 }
+                finally
+                {
+                    KafkaClusterConnectionPool.ReleaseConnection(conn);    
+                }
             }
 
-            return null;
+            return messageSet;
         }
 
         /// <summary>
@@ -143,26 +146,22 @@ namespace Kafka.Client.Consumers
         /// </remarks>
         public IList<BufferedMessageSet> MultiFetch(MultiFetchRequest request)
         {
+            KafkaConnection conn = null;
+            int size = 0;
             var result = new List<BufferedMessageSet>();
             short tryCounter = 1;
             while (tryCounter <= this.config.NumberOfTries)
             {
                 try
                 {
-                    using (var conn = new KafkaConnection(
-                        this.host,
-                        this.port,
-                        this.config.BufferSize,
-                        this.config.SocketTimeout,
-                        this.config.IdleTimeToKeepAlive,
-                        this.config.KeepAliveInterval,
-                        this.config.SocketPollingTimeout,
-                        this.config.SocketPollingLevel))
-                    {
-                        conn.Write(request);
-                        int size = conn.Reader.ReadInt32();
-                        return BufferedMessageSet.ParseMultiFrom(conn.Reader, size, request.ConsumerRequests.Count, request.ConsumerRequests.Select(x => x.Offset).ToList());
-                    }
+                    conn = KafkaClusterConnectionPool.GetConnection(this.host, this.port);        
+                    conn.Write(request);
+                    size = conn.Reader.ReadInt32();
+                    result = (BufferedMessageSet.ParseMultiFrom(conn.Reader, 
+                                                                size, 
+                                                                request.ConsumerRequests.Count, 
+                                                                request.ConsumerRequests.Select(x => x.Offset).ToList())) as List<BufferedMessageSet>;
+                    break;
                 }
                 catch (Exception ex)
                 {
@@ -174,6 +173,10 @@ namespace Kafka.Client.Consumers
 
                     tryCounter++;
                     Logger.InfoFormat(CultureInfo.CurrentCulture, "MultiFetch reconnect due to {0}", ex);
+                }
+                finally
+                {
+                    KafkaClusterConnectionPool.ReleaseConnection(conn);
                 }
             }
 
@@ -191,29 +194,19 @@ namespace Kafka.Client.Consumers
         /// </returns>
         public IList<long> GetOffsetsBefore(OffsetRequest request)
         {
+            KafkaConnection conn = null;
+            int size = 0;
             var result = new List<long>();
             short tryCounter = 1;
             while (tryCounter <= this.config.NumberOfTries)
             {
                 try
                 {
-                    using (var conn = new KafkaConnection(
-                        this.host,
-                        this.port,
-                        this.config.BufferSize,
-                        this.config.SocketTimeout,
-                        this.config.IdleTimeToKeepAlive,
-                        this.config.KeepAliveInterval,
-                        this.config.SocketPollingTimeout,
-                        this.config.SocketPollingLevel))
+                    conn = KafkaClusterConnectionPool.GetConnection(this.host, this.port);
+                    conn.Write(request);
+                    size = conn.Reader.ReadInt32();
+                    if (size > 0)
                     {
-                        conn.Write(request);
-                        int size = conn.Reader.ReadInt32();
-                        if (size == 0)
-                        {
-                            return result;
-                        }
-
                         short errorCode = conn.Reader.ReadInt16();
                         if (errorCode != ErrorMapping.NoError)
                         {
@@ -225,9 +218,8 @@ namespace Kafka.Client.Consumers
                         {
                             result.Add(conn.Reader.ReadInt64());
                         }
-
-                        return result;
                     }
+                    break;
                 }
                 catch (Exception ex)
                 {
@@ -239,6 +231,10 @@ namespace Kafka.Client.Consumers
 
                     tryCounter++;
                     Logger.InfoFormat(CultureInfo.CurrentCulture, "GetOffsetsBefore reconnect due to {0}", ex);
+                }
+                finally
+                {
+                    KafkaClusterConnectionPool.ReleaseConnection(conn);
                 }
             }
 

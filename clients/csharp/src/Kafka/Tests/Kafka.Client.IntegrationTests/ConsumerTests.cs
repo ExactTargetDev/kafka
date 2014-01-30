@@ -77,6 +77,8 @@ namespace Kafka.Client.IntegrationTests
                 offset += resultItem.Offset;
             }
 
+            Thread.Sleep(3000);
+
             // now consuming
             var resultMessages = new List<Message>();
             using (IConsumerConnector consumerConnector = new ZookeeperConsumerConnector(consumerConfig, true))
@@ -132,7 +134,7 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             // now consuming
             int resultCount = 0;
@@ -187,7 +189,7 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             if (maxQueuedChunks.HasValue)
             {
@@ -232,7 +234,7 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             using (IConsumerConnector consumerConnector = new ZookeeperConsumerConnector(consumerConfig, true))
             {
@@ -274,6 +276,8 @@ namespace Kafka.Client.IntegrationTests
             {
                 var producerRequest = new ProducerRequest(CurrentTestTopic, 0, new List<Message> { msg1 });
                 producer.Send(producerRequest);
+
+                Thread.Sleep(3000);
 
                 // now consuming
                 using (IConsumerConnector consumerConnector = new ZookeeperConsumerConnector(consumerConfig, true))
@@ -331,6 +335,8 @@ namespace Kafka.Client.IntegrationTests
                 var producerRequest2 = new ProducerRequest(topic2, 0, new List<Message> { msg2 });
                 producer.Send(producerRequest2);
             }
+
+            Thread.Sleep(3000);
 
             // now consuming
             var resultMessages1 = new List<Message>();
@@ -495,6 +501,8 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
+            Thread.Sleep(3000);
+
             // now consuming
             int messageNumberCounter = 0;
             using (IConsumerConnector consumerConnector = new ZookeeperConsumerConnector(consumerConfig, true))
@@ -559,7 +567,7 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             // now consuming
             int resultCount = 0;
@@ -622,7 +630,7 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             // now consuming
             int resultCount = 0;
@@ -717,7 +725,7 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             // now consuming
             int resultCount = 0;
@@ -841,7 +849,7 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(3000);
 
             // now consuming
             int resultCount = 0;
@@ -896,6 +904,8 @@ namespace Kafka.Client.IntegrationTests
                 }
             }
 
+            Thread.Sleep(3000);
+
             // now consuming
             int messageNumberCounter = 0;
             using (IConsumerConnector consumerConnector = new ZookeeperConsumerConnector(consumerConfig, true))
@@ -929,6 +939,7 @@ namespace Kafka.Client.IntegrationTests
         {
             var prodConfig = this.SyncProducerConfig1;
             var consumerConfig = this.ZooKeeperBasedConsumerConfig;
+
             consumerConfig.FetchSize = 256;
             consumerConfig.NumberOfTries = 1;
             consumerConfig.AutoCommitInterval = 1000;
