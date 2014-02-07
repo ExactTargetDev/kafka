@@ -47,7 +47,13 @@ namespace Kafka.Client
 
         private readonly SocketPollingLevel socketPollingLevel;
 
+        private readonly string server;
+
+        private readonly int port;
+
         private readonly TcpClient client;
+
+        private readonly DateTime timeCreated;
 
         private volatile bool disposed;
 
@@ -60,8 +66,13 @@ namespace Kafka.Client
         /// <param name="socketTimeout"></param>
         /// <param name="idleTimeToKeepAlive">idle time until keepalives (ms)</param>
         /// <param name="keepAliveInterval">interval between keepalives(ms)</param>
+        /// <param name="socketPollingTimeout">socket polling timeout(usec)</param>
+        /// <param name="keepAliveInterval">interval between keepalives(ms)</param>
         public KafkaConnection(string server, int port, int bufferSize, int socketTimeout, long idleTimeToKeepAlive, long keepAliveInterval, long socketPollingTimeout, SocketPollingLevel socketPollingLevel)
         {
+            this.server = server;
+            this.port = port;
+            this.timeCreated = DateTime.Now;
             this.bufferSize = bufferSize;
             this.socketTimeout = socketTimeout;
             this.idleTimeToKeepAlive = (ulong)idleTimeToKeepAlive;
@@ -95,6 +106,12 @@ namespace Kafka.Client
 
         public KafkaBinaryReader Reader { get; private set; }
 
+        internal string Server { get { return this.server; } }
+
+        internal int Port { get { return this.port; } }
+
+        internal DateTime TimeCreated { get { return this.timeCreated; } }
+
         private IPEndPoint RemoteEndPoint
         {
             get
@@ -102,6 +119,7 @@ namespace Kafka.Client
                 return (IPEndPoint)this.client.Client.RemoteEndPoint;
             }
         }
+
 
         /// <summary>
         /// Writes a producer request to the server asynchronously.
@@ -268,12 +286,18 @@ namespace Kafka.Client
         /// </summary>
         private void PollSocket()
         { 
-            if((!this.client.Client.Poll(this.socketTimeout, SelectMode.SelectRead) 
-                && !(this.client.Client.Available == 0))
-                    || !this.client.Client.Connected)
+            if(!IsSocketConnected())
             {
                 throw new IOException(String.Format("Socket {0}:{1} is no longer available.", RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port.ToString()));    
             }
+        }
+
+        internal bool IsSocketConnected()
+        {
+            bool isSocketOpen = !this.client.Client.Poll(this.socketTimeout, SelectMode.SelectRead);
+            bool isSocketAvailable = !(this.client.Client.Available == 0);
+            bool isClientConnected = this.client.Connected;
+            return isSocketOpen && isSocketAvailable || isClientConnected;
         }
 
         /// <summary>

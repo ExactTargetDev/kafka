@@ -60,6 +60,10 @@ namespace Kafka.Client.Cfg
 
         public const SocketPollingLevel DefaultSocketPollingLevel = SocketPollingLevel.NONE;
 
+        public const int DefaultMaxConnectionPoolSize = 100;
+
+        public const int DefaultConnectionLifespan = 300;
+
         public ConsumerConfiguration()
         {
             this.NumberOfTries = DefaultNumberOfTries;
@@ -74,6 +78,8 @@ namespace Kafka.Client.Cfg
             this.KeepAliveInterval = DefaultKeepAliveInterval;
             this.SocketPollingTimeout = DefaultSocketPollingTimeout;
             this.SocketPollingLevel = DefaultSocketPollingLevel;
+            this.MaxConnectionPoolSize = DefaultMaxConnectionPoolSize;
+            this.ConnectionLifeSpan = DefaultConnectionLifespan;
         }
 
         public ConsumerConfiguration(string host, int port)
@@ -100,6 +106,9 @@ namespace Kafka.Client.Cfg
             this.KeepAliveInterval = config.KeepAliveInterval;
             this.SocketPollingTimeout = config.SocketPollingTimeout;
             this.SocketPollingLevel = config.SocketPollingLevel;
+            this.MaxConnectionPoolSize = config.MaxConnectionPoolSize;
+            this.ConnectionLifeSpan = config.ConnectionLifeSpan;
+  
             if (config.Broker.ElementInformation.IsPresent)
             {
                 this.SetBrokerConfiguration(config.Broker);
@@ -162,6 +171,10 @@ namespace Kafka.Client.Cfg
         public long SocketPollingTimeout { get; set; }
 
         public SocketPollingLevel SocketPollingLevel { get; set; }
+
+        public int MaxConnectionPoolSize { get; set; }
+
+        public int ConnectionLifeSpan { get; set; }
 
         private static void Validate(ConsumerConfigurationSection config)
         {

@@ -95,7 +95,7 @@ namespace Kafka.Client.IntegrationTests
                 WaitUntillIdle(client, 1000);
                 IList<string> children = client.GetChildren("/consumers/group1/ids", false);
                 string consumerId = children[0];
-                client.CreateEphemeral(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                client.CreateEphemeral(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                 client.CreateEphemeral(brokerTopicPath, 1);
                 WaitUntillIdle(client, 500);
                 children = client.GetChildren("/consumers/group1/owners/test", false);
@@ -130,7 +130,7 @@ namespace Kafka.Client.IntegrationTests
                 var topicCount = new Dictionary<string, int> { { "test", 1 } };
                 consumerConnector.CreateMessageStreams(topicCount);
                 WaitUntillIdle(client, 1000);
-                client.CreateEphemeral(brokerPath, "192.168.1.39-1310449279123:192.168.1.39:9102");
+                client.CreateEphemeral(brokerPath, "172.16.66.2-1310449279123:172.16.66.2:9092");
                 client.CreateEphemeral(brokerTopicPath, 1);
                 WaitUntillIdle(client, 1000);
                 client.DeleteRecursive(brokerTopicPath);

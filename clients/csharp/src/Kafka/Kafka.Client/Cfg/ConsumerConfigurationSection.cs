@@ -192,6 +192,24 @@ namespace Kafka.Client.Cfg
             }
         }
 
+        [ConfigurationProperty("maxConnectionPoolSize", IsRequired = false, DefaultValue = ConsumerConfiguration.DefaultMaxConnectionPoolSize)]
+        public int MaxConnectionPoolSize
+        {
+            get
+            {
+                return (int)this["maxConnectionPoolSize"];
+            }
+        }
+
+        [ConfigurationProperty("connectionLifeSpan", IsRequired = false, DefaultValue = ConsumerConfiguration.DefaultConnectionLifespan)]
+        public int ConnectionLifeSpan
+        {
+            get
+            {
+                return (int)this["connectionLifeSpan"];
+            }
+        }
+
         public static ConsumerConfigurationSection FromXml(XElement element)
         {
             var section = new ConsumerConfigurationSection();
