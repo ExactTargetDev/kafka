@@ -318,37 +318,49 @@ namespace Kafka.Client.Producers
         /// <returns>Partition for topic</returns>
         private Partition GetPartition(ProducerData<TKey, TData> dataItem)
         {
-            Logger.DebugFormat(
-                CultureInfo.CurrentCulture,
-                "Getting the number of broker partitions registered for topic: {0}",
-                dataItem.Topic);
-            SortedSet<Partition> brokerPartitions = this.brokerPartitionInfo.GetBrokerPartitionInfo(dataItem.Topic);
-            int totalNumPartitions = brokerPartitions.Count;
-            Logger.DebugFormat(
-                CultureInfo.CurrentCulture,
-                "Broker partitions registered for topic: {0} = {1}",
-                dataItem.Topic,
-                totalNumPartitions);
-            int partitionId = this.GetPartitionId(dataItem.Key, totalNumPartitions);
-            Partition brokerIdPartition = brokerPartitions.ToList()[partitionId];
-            Broker brokerInfo = this.brokerPartitionInfo.GetBrokerInfo(brokerIdPartition.BrokerId);
-            if (this.config.IsZooKeeperEnabled)
+            Partition partition = null;
+            Broker brokerInfo = null;
+            int partitionId = 0;
+            try
             {
                 Logger.DebugFormat(
                     CultureInfo.CurrentCulture,
-                    "Sending message to broker {0}:{1} on partition {2}",
+                    "Getting the number of broker partitions registered for topic: {0}",
+                    dataItem.Topic);
+                SortedSet<Partition> brokerPartitions = this.brokerPartitionInfo.GetBrokerPartitionInfo(dataItem.Topic);
+                int totalNumPartitions = brokerPartitions.Count;
+                Logger.DebugFormat(
+                    CultureInfo.CurrentCulture,
+                    "Broker partitions registered for topic: {0} = {1}",
+                    dataItem.Topic,
+                    totalNumPartitions);
+                partitionId = this.GetPartitionId(dataItem.Key, totalNumPartitions);
+                Partition brokerIdPartition = brokerPartitions.ToList()[partitionId];
+                brokerInfo = this.brokerPartitionInfo.GetBrokerInfo(brokerIdPartition.BrokerId);
+                if (this.config.IsZooKeeperEnabled)
+                {
+                    Logger.DebugFormat(
+                        CultureInfo.CurrentCulture,
+                        "Sending message to broker {0}:{1} on partition {2}",
+                        brokerInfo.Host,
+                        brokerInfo.Port,
+                        brokerIdPartition.PartId);
+                    return new Partition(brokerIdPartition.BrokerId, brokerIdPartition.PartId);
+                }
+
+                Logger.DebugFormat(
+                    CultureInfo.CurrentCulture,
+                    "Sending message to broker {0}:{1} on a randomly chosen partition",
                     brokerInfo.Host,
-                    brokerInfo.Port,
-                    brokerIdPartition.PartId);
-                return new Partition(brokerIdPartition.BrokerId, brokerIdPartition.PartId);
+                    brokerInfo.Port);
+                partition = new Partition(brokerIdPartition.BrokerId, ProducerRequest.RandomPartition);
+            }
+            catch (NullReferenceException ex)
+            {
+                throw new KafkaConnectionException(string.Format("Kakfa partition {0} Unavailable on {1}", partitionId, brokerInfo.Host), ex);
             }
 
-            Logger.DebugFormat(
-                CultureInfo.CurrentCulture,
-                "Sending message to broker {0}:{1} on a randomly chosen partition",
-                brokerInfo.Host,
-                brokerInfo.Port);
-            return new Partition(brokerIdPartition.BrokerId, ProducerRequest.RandomPartition);
+            return partition;
         }
 
         /// <summary>

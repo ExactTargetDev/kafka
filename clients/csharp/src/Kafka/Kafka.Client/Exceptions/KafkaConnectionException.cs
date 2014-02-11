@@ -8,6 +8,11 @@
         {
         }
 
+        public KafkaConnectionException(string message)
+            : base(message)
+        { 
+        }
+
         public KafkaConnectionException(Exception exception)
             : base("Connection problem occured.", exception)
         {
