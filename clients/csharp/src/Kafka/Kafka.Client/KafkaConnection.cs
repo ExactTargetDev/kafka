@@ -288,7 +288,7 @@ namespace Kafka.Client
         { 
             if(!IsSocketConnected())
             {
-                throw new IOException(String.Format("Socket {0}:{1} is no longer available.", RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port.ToString()));    
+                throw new KafkaConnectionException(String.Format("Socket {0}:{1} is no longer available.", RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port.ToString()));    
             }
         }
 
@@ -297,7 +297,7 @@ namespace Kafka.Client
             bool isSocketOpen = !this.client.Client.Poll(this.socketTimeout, SelectMode.SelectRead);
             bool isSocketAvailable = !(this.client.Client.Available == 0);
             bool isClientConnected = this.client.Connected;
-            return isSocketOpen && isSocketAvailable || isClientConnected;
+            return isSocketOpen || isSocketAvailable && isClientConnected;
         }
 
         /// <summary>
