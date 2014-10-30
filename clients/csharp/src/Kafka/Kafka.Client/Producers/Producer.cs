@@ -357,7 +357,13 @@ namespace Kafka.Client.Producers
             }
             catch (NullReferenceException ex)
             {
-                throw new KafkaConnectionException(string.Format("Kakfa partition {0} Unavailable on {1}", partitionId, brokerInfo.Host), ex);
+                throw new KafkaConnectionException(
+                    (brokerInfo == null) ? 
+                        "Kafka broker data unavailable from ZooKeeper" :                    
+                        string.Format("Kakfa partition {0} Unavailable on {1}", 
+                                        partitionId, 
+                                        string.IsNullOrEmpty(brokerInfo.Host) ? string.Empty : brokerInfo.Host),
+                                        ex);
             }
 
             return partition;
